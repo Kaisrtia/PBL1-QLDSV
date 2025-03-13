@@ -8,13 +8,10 @@ struct a {
 a *x = (a *)malloc(sizeof(a));
 struct b {
     b *next;
-    a *par;
-    b(a *xx) {
-        par = xx;
-    }
+    a *par = x;
 };
-b *c = new b(x);
-b *d = new b(x);
+b *c = new b();
+b *d = new b();
 int main() {
     cout << 1 << '\n';
     x->name = "Hoang Trung";
