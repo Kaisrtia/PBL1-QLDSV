@@ -6,9 +6,9 @@ struct Student;
 struct Grade;
 struct Subject;
 ifstream studentFileR("StudentsList.txt");
-ofstream studentFileW("StudentsList.txt");
+//ofstream studentFileW("StudentsList.txt");
 ifstream subjectFileR("SubjectsList.txt");
-ofstream subjectFileW("SubjectsList.txt");
+//ofstream subjectFileW("SubjectsList.txt");
 
 // Function
 void Init();
@@ -30,7 +30,6 @@ struct Grade {
     // averageTen, averageFour;
     // If this student does not have this component grade yet, it will set -1 by default 
     Grade(): next(NULL), IDST(0), fullName("") {}; // Default constructor
-    Grade(); // Constructor
     void calAaverage();
     void transformToAlphabet();
 };
@@ -40,7 +39,6 @@ struct Subject {
     int IDS; 
     string name;
     Subject(): next(NULL), IDS(0), name("") {}; // Default constructor
-    Subject(); // Constructor
     Grade *parentGradeNode = new Grade(); // Linked list of grade of each student
     void sortGrade();
     void showGradeList();
@@ -53,25 +51,24 @@ struct Student {
     Subject *parentSubjectNode = subjectList; // Linked list of subject, it refers to global Linked list of Subject
     string fullName;
     Student(): next(NULL), IDST(0), fullName("") {}; // Default constructor 
-    Student(); // Constructor
     void modifyGrade();
     void showGrade();
 };
-Student *studentList = new Student();
+Student *studentsList = new Student();
 
 void addNode(auto *element, auto *parentNode) {
     auto *temp = parentNode;
     while(temp->next != NULL) temp = temp->next;
-    temp-> next = element;
+    temp->next = element;
 }
 
 void Init() {
     string line, temp, name;
     int len;
-    // Get student data from file
-    Student *st = new Student();
+    // Get student data from 
     if(studentFileR) { // Existing this file
         while(getline(studentFileR, line)) {
+            Student *st = new Student();        
             temp = "", name = "";
             len = line.size();
             for(int i=0;i<len;i++) {
@@ -82,16 +79,16 @@ void Init() {
             }
             st->fullName = name;
             st->IDST = stoi(temp);
-            addNode(st, studentList);
+            addNode(st, studentsList);
         }
     } else {    
-        cout << "Cannot access to StudentList!";
+        cout << "Cannot access to StudentsList!";
         exit(0);
     }
     // Get subject data from file
-    Subject *su = new Subject();
     if(subjectFileR) { // Existing this file
         while(getline(subjectFileR, line)) {
+            Subject *su = new Subject();
             temp = "", name = "";
             len = line.size();
             for(int i=0;i<len;i++) {
@@ -104,35 +101,41 @@ void Init() {
             su->IDS = stoi(temp);
             // Reading everysingle line data of this subject
             ifstream gradesList(name);
-            string temp1, line1;
-            int len1, count = 1;
-            while(getline(gradesList, line1)) {
-                Grade *gr = new Grade();
-                len1 = line1.size();
-                for(int j=0;j<len1;j++) {
-                    if(line1[j] == ';') {
-                        if(count == 1) {
-                            gr->IDST = stoi(temp1);
-                            temp1 = "";
-                            count++;
-                        } else if(count == 2) {
-                            gr->fullName = temp1;
-                            temp1 = "";
-                            count = 1;
-                        } else {
-                            gr->grades[count] = stod(temp1);
-                            temp1 = "";
-                            count++;
-                        }
-                    } else temp1 = temp1 + line1[j];
-                } 
-                addNode(gr, su->parentGradeNode);
+            if(gradesList) {
+                string temp1, line1;
+                int len1, count = 1;
+                while(getline(gradesList, line1)) {
+                    temp1 = "";
+                    cout << line1 << '\n';
+                    Grade *gr = new Grade();
+                    len1 = line1.size();
+                    for(int j=0;j<len1;j++) {
+                        if(line1[j] == ';') {
+                            if(count == 1) {
+                                gr->fullName = temp1;
+                                temp1 = "";
+                                count++;
+                            } else if(count == 2) {
+                                gr->IDST = stoi(temp1);
+                                temp1 = "";
+                                count++;
+                            } else {
+                                gr->grades[count-2] = stod(temp1);
+                                temp1 = "";
+                                count++;
+                            }
+                        } else temp1 = temp1 + line1[j];
+                    } 
+                    addNode(gr, su->parentGradeNode);
+                }
+            } else {
+                cout << "Cannot access to file list grade: " << name;
+                exit(0);
             }
+            addNode(su, subjectList); // Adding this subject to linked list   
         }
-        // Adding this subject to linked list
-        addNode(su, subjectList);
     } else {
-        cout << "Cannot accest to SubjectsList!";
+        cout << "Cannot access to SubjectsList!";
         exit(0);
     }
 }
