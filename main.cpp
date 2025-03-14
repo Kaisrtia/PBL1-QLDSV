@@ -1,35 +1,21 @@
 #include<bits/stdc++.h>
 using namespace std;
 
+// Define, macro
+#define averageTen grades[5]
+#define finalGradeFour grades[6]
+
 // Data
-struct Student;
-struct Grade;
-struct Subject;
-fstream studentFile("StudentsList.txt");
-fstream subjectFile("SubjectsList.txt");
-
-// Function
-void Init();
-void addNode();
-void getGrade();
-void saveAndQuit();
-
-int main() {
-    Init();
-    return 0;
-}
-
 struct Grade {
-    Grade *next, *head;
+    Grade *next;
     int IDST;
     string fullName;
     string averageAlphabet; 
-    double grades[8]; // This array indicate for lab1, lab2, progressTest1 ,
-    // progressTest1, finalTest,
+    double grades[7]; // This array indicate for lab1, lab2, progressTest1 ,
+    // progressTest2, finalTest,
     // averageTen, averageFour;
     // If this student does not have this component grade yet, it will set -1 by default 
-    Grade(): next(NULL), head(NULL), IDST(0), averageAlphabet(""),
-    fullName(""), grades({-1,-1,-1,-1,-1,-1,-1,-1}) {}; // Default constructor
+    Grade(): next(nullptr), IDST(0), averageAlphabet(""), fullName("") {}; // Default constructor
     void calAverage() {
         double averageTen, averageFour, sum = 0;
         for(int i=0;i<6;i++) sum += grades[i];
@@ -49,22 +35,34 @@ struct Subject {
     Subject *next;
     int IDS; 
     string name; // 1 2 3 4
-    Subject(): next(NULL), IDS(0), name("") {}; // Default constructor
+    Subject(): next(nullptr), IDS(0), name("") {}; // Default constructor
     Grade *parentGradeNode = new Grade(); // Linked list of grade of each student
     void sortGrade() { // Bubble sort
-        #define finalGradeTen grades[6]
         Grade *temp1 = parentGradeNode->next;
-        temp1->head = parentGradeNode;
-        while(temp1->next != NULL) {
+        while(temp1 != nullptr) {
             Grade *temp2 = parentGradeNode->next;
             while(temp2 != temp1) {
-                if(temp2->finalGradeTen > temp1->finalGradeTen) {
-
+                if(temp2->averageTen > temp1->averageTen) {
+                    // Exchanging data with each other
+                    swap(temp1->IDST, temp2->IDST);
+                    swap(temp1->fullName, temp2->fullName);
+                    swap(temp1->averageAlphabet, temp2->averageAlphabet);
+                    swap(temp1->grades, temp2->grades);
                 }
+                temp2 = temp2->next;
             }
+            temp1 = temp1->next;
         }
     };
-    void showGradeList();
+    void showGradeList() {
+        Grade *student = parentGradeNode->next;
+        while(student != NULL) {
+            cout << student->IDST << ' ' << student->fullName << ' ';
+            for(int i=0;i<6;i++) cout << student->grades[i] << ' ';
+            cout << '\n';
+            student = student->next;
+        }
+    };
 };
 Subject *subjectList = new Subject();
 
@@ -73,16 +71,35 @@ struct Student {
     int IDST;
     Subject *parentSubjectNode = subjectList; // Linked list of subject, it refers to global Linked list of Subject
     string fullName;
-    Student(): next(NULL), IDST(0), fullName("") {}; // Default constructor 
+    Student(): next(nullptr), IDST(0), fullName("") {}; // Default constructor 
     void modifyGrade();
     void showGrade();
 };
 Student *studentsList = new Student();
 
-// Add a element to linked list
+fstream studentFile("StudentsList.txt");
+fstream subjectFile("SubjectsList.txt");
+
+// Function
+void Init();
+void addNode();
+void getGrade();
+void addGrade();
+void saveAndQuit();
+
+int main() {
+    Init();
+    studentsList->next->parentSubjectNode->next->sortGrade();
+    studentsList->next->parentSubjectNode->next->showGradeList();
+    
+    return 0;
+}
+
+
+// Add element to a linked list
 void addNode(auto *element, auto *parentNode) {
     auto *temp = parentNode;
-    while(temp->next != NULL) temp = temp->next;
+    while(temp->next != nullptr) temp = temp->next;
     temp->next = element;
 }
 
@@ -127,10 +144,9 @@ void Init() {
             ifstream gradesList(name);
             if(gradesList) {
                 string temp1, line1;
-                int len1, count = 1;
+                int len1, count;
                 while(getline(gradesList, line1)) {
-                    temp1 = "";
-                    cout << line1 << '\n';
+                    temp1 = "", count = 1;
                     Grade *gr = new Grade();
                     len1 = line1.size();
                     for(int j=0;j<len1;j++) {
@@ -144,12 +160,13 @@ void Init() {
                                 temp1 = "";
                                 count++;
                             } else {
-                                gr->grades[count-2] = stod(temp1);
+                                gr->grades[count-3] = stod(temp1);
                                 temp1 = "";
                                 count++;
                             }
                         } else temp1 = temp1 + line1[j];
-                    } 
+                    }
+                    gr->grades[6] = stod(temp1);
                     addNode(gr, su->parentGradeNode);
                 }
             } else {
