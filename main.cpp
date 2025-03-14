@@ -34,7 +34,7 @@ struct Grade {
 struct Subject {
     Subject *next;
     int IDS; 
-    string name; // 1 2 3 4
+    string name;
     Subject(): next(nullptr), IDS(0), name("") {}; // Default constructor
     Grade *parentGradeNode = new Grade(); // Linked list of grade of each student
     void sortGrade() { // Bubble sort
@@ -55,8 +55,11 @@ struct Subject {
         }
     };
     void showGradeList() {
+        int count = 0;
         Grade *student = parentGradeNode->next;
         while(student != NULL) {
+            count++;
+            if(count == 1) cout << name << '\n';
             cout << student->IDST << ' ' << student->fullName << ' ';
             for(int i=0;i<7;i++) cout << student->grades[i] << ' ';
             cout << '\n';
@@ -87,13 +90,15 @@ struct Student {
             while(currentStudent != nullptr) {
                 if(currentStudent->IDST == IDST) {
                     count++;
-                    if(count == 1) cout << IDST << ' ' << fullName << ' ';
-                    cout << currentSubject->name << ': ';
+                    if(count == 1) cout << IDST << ' ' << fullName << '\n';
+                    cout << currentSubject->name << ": ";
                     for(int i=0;i<7;i++) cout << currentStudent->grades[i] << ' ';
                     cout << '\n';
                     break;
                 }
+                currentStudent = currentStudent->next;
             }
+            currentSubject = currentSubject->next;
         } 
         if(count == 0) cout << "This student does not join any class!";
     }
@@ -112,9 +117,6 @@ void saveAndQuit();
 
 int main() {
     Init();
-    studentsList->next->parentSubjectNode->next->sortGrade();
-    studentsList->next->parentSubjectNode->next->showGradeList();
-    
     return 0;
 }
 
@@ -208,9 +210,4 @@ void saveAndQuit() {
     studentFile.close();
     subjectFile.close();
     exit(0);
-}
-
-// Getting grade
-void getGrade() {
-    
 }
