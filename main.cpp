@@ -5,10 +5,8 @@ using namespace std;
 struct Student;
 struct Grade;
 struct Subject;
-ifstream studentFileR("StudentsList.txt");
-//ofstream studentFileW("StudentsList.txt");
-ifstream subjectFileR("SubjectsList.txt");
-//ofstream subjectFileW("SubjectsList.txt");
+fstream studentFile("StudentsList.txt");
+fstream subjectFile("SubjectsList.txt");
 
 // Function
 void Init();
@@ -22,25 +20,50 @@ int main() {
 }
 
 struct Grade {
-    Grade *next;
+    Grade *next, *head;
     int IDST;
     string fullName;
-    double grades[8]; // This array indicate for
-    // lab1, lab2, progressTest1 , progressTest1, finalTest;
+    string averageAlphabet; 
+    double grades[8]; // This array indicate for lab1, lab2, progressTest1 ,
+    // progressTest1, finalTest,
     // averageTen, averageFour;
     // If this student does not have this component grade yet, it will set -1 by default 
-    Grade(): next(NULL), IDST(0), fullName("") {}; // Default constructor
-    void calAaverage();
-    void transformToAlphabet();
+    Grade(): next(NULL), head(NULL), IDST(0), averageAlphabet(""),
+    fullName(""), grades({-1,-1,-1,-1,-1,-1,-1,-1}) {}; // Default constructor
+    void calAverage() {
+        double averageTen, averageFour, sum = 0;
+        for(int i=0;i<6;i++) sum += grades[i];
+        averageTen = sum / 6;
+        if(averageTen >= 8.5) averageFour = 4.0, averageAlphabet = "A";
+        else if(averageTen >= 8.0) averageFour = 3.5, averageAlphabet = "B+";
+        else if(averageTen >= 7.0) averageFour = 3.0, averageAlphabet = "B";
+        else if(averageTen >= 6.5) averageFour = 2.5, averageAlphabet = "C+";
+        else if(averageTen >= 5.5) averageFour = 2.0, averageAlphabet = "C";
+        else if(averageTen >= 5.0) averageFour = 1.5, averageAlphabet = "D+";
+        else if(averageTen >= 4.0) averageFour = 1.0, averageAlphabet = "D";
+        else averageFour = 0.0, averageAlphabet = "F";
+    }
 };
 
 struct Subject {
     Subject *next;
     int IDS; 
-    string name;
+    string name; // 1 2 3 4
     Subject(): next(NULL), IDS(0), name("") {}; // Default constructor
     Grade *parentGradeNode = new Grade(); // Linked list of grade of each student
-    void sortGrade();
+    void sortGrade() { // Bubble sort
+        #define finalGradeTen grades[6]
+        Grade *temp1 = parentGradeNode->next;
+        temp1->head = parentGradeNode;
+        while(temp1->next != NULL) {
+            Grade *temp2 = parentGradeNode->next;
+            while(temp2 != temp1) {
+                if(temp2->finalGradeTen > temp1->finalGradeTen) {
+
+                }
+            }
+        }
+    };
     void showGradeList();
 };
 Subject *subjectList = new Subject();
@@ -56,6 +79,7 @@ struct Student {
 };
 Student *studentsList = new Student();
 
+// Add a element to linked list
 void addNode(auto *element, auto *parentNode) {
     auto *temp = parentNode;
     while(temp->next != NULL) temp = temp->next;
@@ -66,8 +90,8 @@ void Init() {
     string line, temp, name;
     int len;
     // Get student data from 
-    if(studentFileR) { // Existing this file
-        while(getline(studentFileR, line)) {
+    if(studentFile) { // Existing this file
+        while(getline(studentFile, line)) {
             Student *st = new Student();        
             temp = "", name = "";
             len = line.size();
@@ -86,8 +110,8 @@ void Init() {
         exit(0);
     }
     // Get subject data from file
-    if(subjectFileR) { // Existing this file
-        while(getline(subjectFileR, line)) {
+    if(subjectFile) { // Existing this file
+        while(getline(subjectFile, line)) {
             Subject *su = new Subject();
             temp = "", name = "";
             len = line.size();
@@ -138,4 +162,16 @@ void Init() {
         cout << "Cannot access to SubjectsList!";
         exit(0);
     }
+}
+
+// Quit program
+void saveAndQuit() {
+    studentFile.close();
+    subjectFile.close();
+    exit(0);
+}
+
+// Getting grade
+void getGrade() {
+    
 }
