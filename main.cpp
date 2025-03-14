@@ -58,7 +58,7 @@ struct Subject {
         Grade *student = parentGradeNode->next;
         while(student != NULL) {
             cout << student->IDST << ' ' << student->fullName << ' ';
-            for(int i=0;i<6;i++) cout << student->grades[i] << ' ';
+            for(int i=0;i<7;i++) cout << student->grades[i] << ' ';
             cout << '\n';
             student = student->next;
         }
@@ -72,8 +72,31 @@ struct Student {
     Subject *parentSubjectNode = subjectList; // Linked list of subject, it refers to global Linked list of Subject
     string fullName;
     Student(): next(nullptr), IDST(0), fullName("") {}; // Default constructor 
-    void modifyGrade();
-    void showGrade();
+    void modifyGrade(int idOfSubject, int idOfGrade, double value) {
+        Subject *currentSubject = parentSubjectNode->next;
+        while(currentSubject->IDS != idOfSubject) currentSubject = currentSubject->next;
+        Grade *currentGrade = currentSubject->parentGradeNode->next;
+        while(currentGrade->IDST != IDST) currentGrade = currentGrade->next;
+        currentGrade->grades[idOfGrade] = value;
+    }
+    void showGrade() {
+        int count = 0;
+        Subject *currentSubject = parentSubjectNode->next;
+        while(currentSubject != nullptr) {
+            Grade *currentStudent = currentSubject->parentGradeNode->next;
+            while(currentStudent != nullptr) {
+                if(currentStudent->IDST == IDST) {
+                    count++;
+                    if(count == 1) cout << IDST << ' ' << fullName << ' ';
+                    cout << currentSubject->name << ': ';
+                    for(int i=0;i<7;i++) cout << currentStudent->grades[i] << ' ';
+                    cout << '\n';
+                    break;
+                }
+            }
+        } 
+        if(count == 0) cout << "This student does not join any class!";
+    }
 };
 Student *studentsList = new Student();
 
@@ -94,7 +117,6 @@ int main() {
     
     return 0;
 }
-
 
 // Add element to a linked list
 void addNode(auto *element, auto *parentNode) {
