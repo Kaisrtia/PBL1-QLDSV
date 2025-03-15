@@ -48,7 +48,7 @@ struct Subject {
                     swap(temp1->fullName, temp2->fullName);
                     swap(temp1->averageAlphabet, temp2->averageAlphabet);
                     swap(temp1->grades, temp2->grades);
-                }
+                } 
                 temp2 = temp2->next;
             }
             temp1 = temp1->next;
@@ -68,6 +68,7 @@ struct Subject {
     };
 };
 Subject *subjectList = new Subject();
+int currentSubjectCounter = 0;
 
 struct Student {
     Student *next;
@@ -110,9 +111,10 @@ fstream subjectFile("SubjectsList.txt");
 
 // Function
 void Init();
-void addNode();
-void getGrade();
+void addSubject();
+void addStudent();
 void addGrade();
+void addNode();
 void saveAndQuit();
 
 int main() {
@@ -204,6 +206,41 @@ void Init() {
         exit(0);
     }
 }
+
+// Add subject
+void addSubject() {
+    string name;
+    cout << "Enter your subject name: "; cin >> name;
+    // Add subject to linked list
+    Subject *element = new Subject();
+    element->name = name;
+    element->IDS = currentSubjectCounter + 1;
+    currentSubjectCounter++;
+    addNode(element, subjectList->next);
+    // Writing subject to file
+}
+
+// Add student
+void addStudent() {
+    string fullName;
+    int IDST;
+    cout << "Enter your ID student: "; cin >> IDST;
+    Student *temp = studentsList;
+    while(temp->next != NULL) {
+        if(temp->next->IDST == IDST) {
+            cout << "This student has been added!";
+            return;
+        }
+        temp = temp->next;
+    }
+    cout << "Enter your student's name: "; cin >> fullName;
+    Student *element = new Student();
+    element->fullName = fullName;
+    element->IDST = IDST;
+    temp->next = element;
+}
+
+// Add grade
 
 // Quit program
 void saveAndQuit() {
